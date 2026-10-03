@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media Pembelajaran Interaktif</title>
+<style>
+:root{--primary:#4f46e5;--secondary:#7c3aed;--bg:#f5f7ff;--text:#172033;--muted:#64748b;--card:#fff;--good:#16a34a;--bad:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:34px 18px;text-align:center}
+main{max-width:1000px;margin:28px auto;padding:0 18px}.card{background:var(--card);border-radius:20px;padding:24px;box-shadow:0 8px 30px #1e1b4b14;margin-bottom:20px}
+h1{margin:0 0 8px;font-size:clamp(28px,5vw,44px)}h2{margin-top:0}.sub{opacity:.9}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+button{border:0;border-radius:12px;padding:13px 16px;font-weight:700;cursor:pointer;font-size:15px}
+.tab{background:#eef2ff;color:#3730a3}.tab.active{background:var(--primary);color:#fff}
+.topic{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}.topic input,.topic select{flex:1;min-width:180px;padding:13px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
+.lesson{line-height:1.75}.lesson ul{padding-left:22px}
+.quiz-q{font-weight:700;font-size:19px;margin-bottom:14px}.answers{display:grid;gap:10px}.answers button{text-align:left;background:#f8fafc;border:2px solid #e2e8f0}.answers button:hover{border-color:#818cf8}.answers button.correct{background:#dcfce7;border-color:#22c55e}.answers button.wrong{background:#fee2e2;border-color:#ef4444}
+.feedback{min-height:28px;margin-top:12px;font-weight:700}.progress{height:10px;background:#e2e8f0;border-radius:99px;overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,#4f46e5,#8b5cf6);width:0;transition:.3s}
+.score{text-align:center;font-size:22px;font-weight:800}.hidden{display:none}.badge{display:inline-block;padding:7px 11px;background:#ede9fe;color:#5b21b6;border-radius:99px;font-size:13px;font-weight:700}
+footer{text-align:center;color:var(--muted);padding:20px}
+@media(max-width:650px){.tabs{grid-template-columns:repeat(2,1fr)}.card{padding:18px}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Media Pembelajaran Interaktif</h1>
+  <div class="sub">Belajar • Eksplorasi • Berlatih • Dapatkan Skor</div>
+</header>
+<main>
+  <section class="card">
+    <div class="topic">
+      <input id="topicInput" value="Fotosintesis" aria-label="Topik pembelajaran">
+      <select id="level"><option>SD</option><option>SMP</option><option>SMA</option><option>Universitas</option></select>
+      <button onclick="applyTopic()" style="background:#4f46e5;color:#fff">Terapkan Topik</button>
+    </div>
+    <span class="badge" id="levelBadge">SD</span>
+  </section>
+
+  <nav class="tabs" aria-label="Navigasi pembelajaran">
+    <button class="tab active" onclick="showTab('materi',this)">📚 Materi</button>
+    <button class="tab" onclick="showTab('aktivitas',this)">🧩 Aktivitas</button>
+    <button class="tab" onclick="showTab('kuis',this)">🎯 Kuis</button>
+    <button class="tab" onclick="showTab('refleksi',this)">💡 Refleksi</button>
+  </nav>
+
+  <section id="materi" class="card panel">
+    <h2 id="materiTitle">🌱 Mengenal Fotosintesis</h2>
+    <p id="materiIntro">Fotosintesis adalah proses tumbuhan membuat makanan dengan memanfaatkan cahaya matahari.</p>
+    <ul id="materiList">
+      <li><b>Klorofil</b> membantu menangkap energi cahaya.</li>
+      <li><b>Air</b> dan <b>karbon dioksida</b> menjadi bahan yang digunakan tumbuhan.</li>
+      <li>Hasil pentingnya adalah <b>glukosa</b> dan oksigen.</li>
+    </ul>
+    <div class="card" style="background:#f8fafc;margin:18px 0 0">
+      <h3>🔎 Coba jelaskan dengan bahasamu sendiri</h3>
+      <textarea id="reflectionBox" rows="4" style="width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px" placeholder="Tuliskan pemahamanmu..."></textarea>
+    </div>
+  </section>
+
+  <section id="aktivitas" class="card panel hidden">
+    <h2>🧩 Aktivitas Cepat</h2>
+    <p>Urutkan proses berikut secara logis dengan memilih langkah pertama, kedua, dan ketiga.</p>
+    <div style="display:grid;gap:10px">
+      <button onclick="activity(1)">1. Cahaya matahari ditangkap oleh klorofil</button>
+      <button onclick="activity(2)">2. Air dan karbon dioksida digunakan dalam proses</button>
+      <button onclick="activity(3)">3. Tumbuhan menghasilkan makanan dan oksigen</button>
+    </div>
+    <p id="activityFeedback" class="feedback"></p>
+  </section>
+
+  <section id="kuis" class="card panel hidden">
+    <h2>🎯 Kuis Interaktif</h2>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <p id="qCounter"></p><div id="question" class="quiz-q"></div><div id="answers" class="answers"></div>
+    <div id="feedback" class="feedback" aria-live="polite"></div>
+    <button id="nextBtn" onclick="nextQuestion()" class="hidden" style="background:#4f46e5;color:#fff;margin-top:8px">Pertanyaan Berikutnya →</button>
+  </section>
+
+  <section id="refleksi" class="card panel hidden">
+    <h2>💡 Refleksi Belajar</h2>
+    <p>Setelah belajar, pilih pernyataan yang paling sesuai.</p>
+    <div class="answers">
+      <button onclick="reflect(this,'Saya sudah memahami konsep utama.')">😊 Saya sudah memahami konsep utama.</button>
+      <button onclick="reflect(this,'Saya memahami sebagian dan masih perlu latihan.')">🙂 Saya memahami sebagian dan masih perlu latihan.</button>
+      <button onclick="reflect(this,'Saya perlu mempelajari materi kembali.')">🔁 Saya perlu mempelajari materi kembali.</button>
+    </div>
+    <p id="reflectResult" class="feedback"></p>
+    <div id="finalScore" class="score"></div>
+  </section>
+</main>
+<footer>Media pembelajaran interaktif • dapat dikembangkan untuk berbagai mata pelajaran</footer>
+
+<script>
+const quiz=[
+ {q:"Apa yang membantu tumbuhan menangkap energi cahaya?",a:["Klorofil","Glukosa","Oksigen","Tanah"],c:0},
+ {q:"Salah satu bahan yang digunakan dalam fotosintesis adalah...",a:["Karbon dioksida","Garam","Protein","Vitamin"],c:0},
+ {q:"Salah satu hasil fotosintesis adalah...",a:["Glukosa","Pasir","Nitrogen","Protein hewani"],c:0},
+ {q:"Mengapa cahaya penting bagi fotosintesis?",a:["Menyediakan energi","Menggantikan air","Menghasilkan tanah","Menghilangkan klorofil"],c:0},
+ {q:"Gas yang dilepaskan sebagai salah satu hasil fotosintesis adalah...",a:["Oksigen","Helium","Metana","Hidrogen"],c:0}
+];
+let qi=0,score=0,activityStep=0;
+function showTab(id,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='kuis')renderQ()}
+function renderQ(){if(qi>=quiz.length){document.getElementById('question').textContent="Kuis selesai!";document.getElementById('answers').innerHTML="";document.getElementById('qCounter').textContent="";document.getElementById('feedback').textContent="Skor akhir: "+score+"/"+quiz.length;document.getElementById('finalScore').textContent="🎉 Skor kamu: "+score+"/"+quiz.length;return}
+let x=quiz[qi];document.getElementById('qCounter').textContent=`Pertanyaan ${qi+1} dari ${quiz.length}`;document.getElementById('bar').style.width=(qi/quiz.length*100)+"%";document.getElementById('question').textContent=x.q;document.getElementById('feedback').textContent="";document.getElementById('nextBtn').classList.add('hidden');
+document.getElementById('answers').innerHTML=x.a.map((a,i)=>`<button onclick="answer(${i})">${String.fromCharCode(65+i)}. ${a}</button>`).join("")}
+function answer(i){let x=quiz[qi],bs=document.querySelectorAll('#answers button');bs.forEach(b=>b.disabled=true);if(i===x.c){score++;bs[i].classList.add('correct');document.getElementById('feedback').textContent="✓ Benar!";}else{bs[i].classList.add('wrong');bs[x.c].classList.add('correct');document.getElementById('feedback').textContent="✗ Belum tepat. Jawaban yang benar ditandai hijau."}document.getElementById('nextBtn').classList.remove('hidden')}
+function nextQuestion(){qi++;renderQ()}
+function activity(n){if(n===activityStep+1){activityStep++;document.getElementById('activityFeedback').textContent=activityStep===3?"🎉 Urutanmu benar!":"✓ Tepat, lanjutkan langkah berikutnya."}else{document.getElementById('activityFeedback').textContent="Coba perhatikan urutan prosesnya lagi."}}
+function reflect(btn,msg){document.getElementById('reflectResult').textContent="Pilihanmu: "+msg}
+function applyTopic(){let t=document.getElementById('topicInput').value.trim()||"Materi Pembelajaran";let l=document.getElementById('level').value;document.getElementById('title').textContent="Media Pembelajaran: "+t;document.getElementById('materiTitle').textContent="📚 "+t;document.getElementById('levelBadge').textContent=l}
+renderQ();
+</script>
+</body>
+</html>
